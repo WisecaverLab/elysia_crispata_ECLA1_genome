@@ -1,0 +1,18 @@
+library(stringr)
+library(tximport)
+
+filesfile <- 'abundance_files.txt'
+files <- scan(filesfile, what = 'list')
+file_names <- str_split(files, '/', simplify = TRUE)
+file_names <- file_names[,ncol(file_names)-1]
+names(files) <- file_names
+
+t2gfile <- 'transcripts_to_genes2.txt'
+tx2gene <- read.table(t2gfile, sep="\t")
+
+samplefile <- 'samples_conditions.txt'
+sampleTable <- read.table(samplefile, sep="\t", header=TRUE)
+
+txi <- tximport(files, type = "kallisto", tx2gene = tx2gene, countsFromAbundance = "lengthScaledTPM")
+
+write.table(txi$counts, 'lengthScaledTPM.matrix', sep="\t", quote = FALSE)

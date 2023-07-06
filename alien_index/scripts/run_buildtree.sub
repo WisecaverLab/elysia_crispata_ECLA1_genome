@@ -1,0 +1,124 @@
+#! /usr/local/bin/bash
+#SBATCH --mail-type=END,FAIL
+
+CWD=$PWD
+
+module load conda-env/env.genomics
+module load hmmer 
+module load mafft
+module load iqtree
+module load trimal
+module load raxml 
+
+GENE=`sed -n "${SLURM_ARRAY_TASK_ID}p" $GENELIST | cut -f 1`
+
+# extract full length sequences
+
+PROGRAM="python $CWD/scripts/extract_sequences.py"
+IN="$CWD/tree-out/fasta"
+
+echo -e "\nCOMMAND: $PROGRAM -q $QUERY -s $GENE -i $PARSEDIR -d $DB -o $IN -x $MAXSEQ -e $MAXEVALUE\n"
+time $PROGRAM -q $QUERY -s $GENE -i $PARSEDIR -d $DB -o $IN -x $MAXSEQ -e $MAXEVALUE
+
+IN="$CWD/tree-out/fasta"
+OUT="$CWD/tree-out/mafft"
+
+cd $IN
+if [ ! -f "${IN}/${GENE}.fa" ]; then 
+	exit 0
+fi
+
+COUNT=`grep ">" ${IN}/${GENE}.fa | wc -l`
+NL=$'\n'
+COUNT=${COUNT%$NL}
+
+echo -e "\n$COUNT sequences in ${IN}/${GENE}.fa\n"	
+
+# align sequences
+if [[ "$COUNT" -ge "$MINSEQ" ]]; then
+	echo -e "\nCOMMAND: $MAFFT $MAFFTOPT --thread $THREADS ${IN}/${GENE}.fa > ${OUT}/${GENE}.aln\n"
+	time $MAFFT $MAFFTOPT --thread $THREADS ${IN}/${GENE}.fa > ${OUT}/${GENE}.aln
+else 
+    echo -e "\n\nSkipping Query $GENE : retained hits $COUNT < minimum $MINSEQ\n"
+    exit 0
+fi
+
+IN="$CWD/tree-out/mafft"
+OUT="$CWD/tree-out/trimal"
+
+cd $IN
+if [ ! -f "${IN}/${GENE}.aln" ]; then 
+    echo -e "\nWARNING : no alignment file for $GENE\n"	
+	exit 3
+fi
+
+# trim sequences
+echo -e "\nCOMMAND: $TRIMAL -in ${IN}/${GENE}.aln -out ${OUT}/${GENE}.aln.trim $TRIMOPT\n"
+time $TRIMAL -in ${IN}/${GENE}.aln -out ${OUT}/${GENE}.aln.trim $TRIMOPT
+
+# build trees
+PRE="$CWD/tree-out/mafft"
+IN="$CWD/tree-out/trimal"
+OUT="$CWD/tree-out/tree"
+
+cd $IN
+if [ ! -f "${IN}/${GENE}.aln.trim" ]; then 
+    echo -e "\nWARNING : no trimmed alignment file for $GENE\n"	
+	exit 3
+fi
+
+# build trees
+PRENUM=`grep ">" $PRE/${GENE}.aln | wc -l`
+NEWNUM=`grep ">" $IN/${GENE}.aln.trim | wc -l`
+PRELEN=`python $CWD/scripts/aln_len.py $PRE/${GENE}.aln`
+NEWLEN=`python $CWD/scripts/aln_len.py $IN/${GENE}.aln.trim`
+
+echo -e "\nFLAG: $GENE alignment length pre trimming = $PRELEN"
+echo -e "FLAG: $GENE alignment length post trimming = $NEWLEN"
+echo -e "FLAG: $GENE seq count pre trimming = $PRENUM"
+echo -e "FLAG: $GENE seq count post trimming = $NEWNUM\n"
+
+if [[ "$NEWLEN" -lt "$MINLEN" ]]; then
+	echo -e "\nSkipping $GENE : trimmed alignment length $NEWLEN < minimum $MINLEN\n"
+	exit 0
+fi
+
+
+if [[ "$TREETYPE" == 'raxml' ]]; then
+	
+	echo -e "\nCOMMAND: $RAXML -s ${GENE}.aln.trim -n ${GENE}.out $RAXMLOPT -T $THREADS\n"
+	$RAXML -s ${GENE}.aln.trim -n ${GENE}.out $RAXMLOPT  -T $THREADS
+	mv *.${GENE}.out $OUT
+
+	cd $OUT
+	mv RAxML_bipartitions.${GENE}.out RAxML_bipartitions.${GENE}.contree
+
+fi
+
+if [[ "$TREETYPE" == 'iqtree' ]]; then
+	
+	echo -e "\nCOMMAND: $IQTREE -s $IN/${GENE}.aln.trim $IQTREEOPT -pre $OUT/${GENE} -nt AUTO -ntmax $THREADS\n"
+	$IQTREE -s $IN/${GENE}.aln.trim $IQTREEOPT -pre $OUT/${GENE} -nt AUTO -ntmax $THREADS
+
+	cd $OUT
+	
+fi
+
+if [[ "$TREETYPE" == 'both' ]]; then
+	
+	echo -e "\nCOMMAND: $IQTREE -s $IN/${GENE}.aln.trim $IQTREEOPT -pre $OUT/${GENE} -nt AUTO -ntmax $THREADS\n"
+	$IQTREE -s $IN/${GENE}.aln.trim $IQTREEOPT -pre $OUT/${GENE} -nt AUTO -ntmax $THREADS
+
+	cd $OUT
+	
+	cd $IN
+
+	echo -e "\nCOMMAND: $RAXML -s ${GENE}.aln.trim -n ${GENE}.out $RAXMLOPT -T $THREADS\n"
+	$RAXML -s ${GENE}.aln.trim -n ${GENE}.out $RAXMLOPT -T $THREADS
+	mv *.${GENE}.out $OUT
+
+	cd $OUT
+	mv RAxML_bipartitions.${GENE}.out RAxML_bipartitions.${GENE}.contree
+
+fi
+

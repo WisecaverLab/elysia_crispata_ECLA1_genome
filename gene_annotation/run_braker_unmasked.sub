@@ -1,0 +1,49 @@
+#!/bin/bash
+#SBATCH --account=jwisecav
+#SBATCH --mail-type=END,FAIL
+#SBATCH --nodes=1
+#SBATCH --ntasks=72
+#SBATCH --time=14-00:00:00
+#SBATCH --output=slurm-out/%x.o%j
+#SBATCH --error=slurm-out/%x.e%j
+
+# export ASSM=''; sbatch --mail-user=$EMAIL -J "${ASSM}-braker" scripts/run_braker.sub
+
+# may need to copy the genemark key into your working directory
+# cp /depot/jwisecav/etc/gm_key_64 ~/.gm_key
+# key is good for 200 days (downloaded 2022-04-14 good through Oct 31)
+# to download again:
+# https://github.com/Gaius-Augustus/BRAKER#mandatory-tools
+
+module load braker
+
+CWD=$PWD
+SCRIPTS="$CWD/scripts"
+GENOME="$CWD/genomes/${ASSM}.fa.cleanheaders"
+PROTDBS="$CWD/homologous_proteins/proteins_clean.fasta"
+BAMFILE="$CWD/alignment/${ASSM}.sorted.bam"
+OUTDIR="${ASSM}-unmasked"
+if [ -d "$OUTDIR" ]; then rm -rf $OUTDIR; fi
+
+echo "Creating working directories"
+if [ ! -d "$OUTDIR" ]; then mkdir -p $OUTDIR; fi
+
+( time braker.pl --genome=$GENOME --prot_seq=$PROTDBS --bam=$BAMFILE --etpmode --gff3 --workingdir=$OUTDIR --cores 48 ) &> ${OUTDIR}.log
+
+if [ -f "${OUTDIR}/augustus.hints.gtf" ]; then
+
+	# Rename and select longest protein and codingseq
+	module load conda-env/env.genomics
+	echo $SCRIPTS/parse_braker.py $OUTDIR
+	$SCRIPTS/parse_braker.py $OUTDIR
+
+	cp ${OUTDIR}/augustus.hints.gtf ${OUTDIR}.gtf
+	cp ${OUTDIR}/augustus.hints.gff3 ${OUTDIR}.gff3
+
+	# Finally delete any remaining GeneMark-ES temporary data files
+	if [ -d "${OUTDIR}/GeneMark-ES/output/data" ]; then rm -rf ${OUTDIR}/GeneMark-ES/output/data; fi
+
+fi
+
+
+

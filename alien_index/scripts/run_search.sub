@@ -1,0 +1,45 @@
+#! /usr/local/bin/bash
+#SBATCH --mail-type=END,FAIL
+
+module load hmmer
+
+THREADS="$(($THREADS-1))"
+
+if [[ "$PROGRAM" == 'phmmer' ]]; then
+
+	# for phmmer v DB
+	INPUT="$PWD/split/query.${SLURM_ARRAY_TASK_ID}" 
+	OUTPUT="$HMMRDIR/phmmerout.${SLURM_ARRAY_TASK_ID}"
+
+	echo $PROGRAM --cpu $THREADS $HMMEROPTS --tblout $OUTPUT $INPUT $DB
+	( time $PROGRAM --cpu $THREADS $HMMEROPTS --tblout $OUTPUT $INPUT $DB ) 2>&1
+
+	# for parser
+	SELF="${QUERY}.vself.hmmer"
+	INPUT="$HMMRDIR/phmmerout.${SLURM_ARRAY_TASK_ID}"
+	PARSEOUT="$HMMRDIR/normbitout.${SLURM_ARRAY_TASK_ID}"
+
+	echo python scripts/parse_phmmer.py -i $INPUT -o $PARSEOUT -s $SELF -n $MAX_HITS_PER_QUERY -m $MAX_HITS_PER_SUBJECT -e $EVALUE_THRESHOLD
+	( time python scripts/parse_phmmer.py -i $INPUT -o $PARSEOUT -s $SELF -n $MAX_HITS_PER_QUERY -m $MAX_HITS_PER_SUBJECT -e $EVALUE_THRESHOLD ) 2>&1
+
+fi
+
+if [[ "$PROGRAM" == 'diamond' ]]; then
+
+	# for diamond v DB
+	INPUT="$PWD/split/query.${SLURM_ARRAY_TASK_ID}" 
+	OUTPUT="$DMNDIR/dmndout.${SLURM_ARRAY_TASK_ID}"
+
+	echo $PROGRAM $DMNDOPTS --query $INPUT --db $DB --out $OUTPUT --outfmt 6 --threads $THREADS
+	( time $PROGRAM $DMNDOPTS --query $INPUT --db $DB --out $OUTPUT --outfmt 6 --threads $THREADS ) 2>&1
+
+	# for parser
+	SELF="${QUERY}.vself.dmnd"
+	INPUT="$DMNDIR/dmndout.${SLURM_ARRAY_TASK_ID}"
+	PARSEOUT="$DMNDIR/normbitout.${SLURM_ARRAY_TASK_ID}"
+
+	echo python scripts/parse_diamond.py -i $INPUT -o $PARSEOUT -s $SELF -n $MAX_HITS_PER_QUERY -m $MAX_HITS_PER_SUBJECT -e $EVALUE_THRESHOLD
+	( time python scripts/parse_diamond.py -i $INPUT -o $PARSEOUT -s $SELF -n $MAX_HITS_PER_QUERY -m $MAX_HITS_PER_SUBJECT -e $EVALUE_THRESHOLD ) 2>&1
+
+fi
+

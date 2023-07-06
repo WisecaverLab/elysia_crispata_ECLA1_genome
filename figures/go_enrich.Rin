@@ -1,0 +1,51 @@
+Set	Name	x	seqfreq	adjpval
+gastropods	response to stimulus (GO:0050896)	187	0.570121951	0.042696591
+gastropods	developmental process (GO:0032502)	182	0.554878049	0.017159611
+gastropods	membrane (GO:0016020)	170	0.518292683	0.078945315
+gastropods	catalytic activity (GO:0003824)	165	0.50304878	0.015295914
+gastropods	cellular response to stimulus (GO:0051716)	144	0.43902439	0.028016251
+gastropods	response to chemical (GO:0042221)	133	0.405487805	0.001498272
+gastropods	endomembrane system (GO:0012505)	131	0.399390244	0.004792423
+gastropods	reg. of biological quality (GO:0065008)	130	0.396341463	0.011983877
+gastropods	cell periphery (GO:0071944)	128	0.390243902	0.001153515
+gastropods	plasma membrane (GO:0005886)	122	0.37195122	0.002471567
+gastropods	reg. of multicellular OP (GO:0051239)	117	0.356707317	0.00010969
+gastropods	reg. of localization (GO:0032879)	108	0.329268293	2.11E-05
+gastropods	anatomical structure morphogenesis (GO:0009653)	107	0.326219512	0.001289862
+gastropods	response to stress (GO:0006950)	106	0.323170732	0.025740387
+gastropods	reg. of signaling (GO:0023051)	100	0.304878049	0.026386787
+gastropods	reg. of cell communication (GO:0010646)	99	0.301829268	0.028487399
+gastropods	cell projection (GO:0042995)	93	0.283536585	9.90E-05
+gastropods	cell response to chemical stimulus (GO:0070887)	92	0.280487805	0.001074864
+gastropods	plasma mem. bounded cell projection (GO:0120025)	91	0.277439024	0.000199534
+gastropods	ion binding (GO:0043167)	89	0.271341463	0.004927078
+gastropods	reg. of developmental process (GO:0050793)	89	0.271341463	0.037018667
+gastropods	reg. of molecular function (GO:0065009)	87	0.265243902	0.015744592
+gastropods	vesicle (GO:0031982)	86	0.262195122	0.000692173
+gastropods	cytoplasmic vesicle (GO:0031410)	84	0.256097561	0.000317974
+gastropods	small molecule MP (GO:0044281)	83	0.25304878	0.004861729
+sacoglossans	carbohydrate derivative binding (GO:0097367)	24	0.32	9.26E-06
+sacoglossans	small molecule binding (GO:0036094)	16	0.213333333	0.034765442
+sacoglossans	chitin binding (GO:0008061)	11	0.146666667	1.32E-05
+sacoglossans	ribonucleoside triphosphate binding (GO:0035639)	10	0.133333333	0.018028002
+sacoglossans	guanyl nucleotide binding (GO:0019001)	10	0.133333333	0.000120977
+sacoglossans	nucleoside binding (GO:0001882)	10	0.133333333	7.88E-05
+sacoglossans	purine nucleoside binding (GO:0001883)	10	0.133333333	6.46E-05
+sacoglossans	purine ribonucleoside binding (GO:0032550)	10	0.133333333	6.46E-05
+sacoglossans	GTP binding (GO:0005525)	10	0.133333333	5.37E-05
+sacoglossans	reg. of cytokine production (GO:0001817)	8	0.106666667	0.038875379
+sacoglossans	neg. reg. of cell adhesion (GO:0007162)	8	0.106666667	0.001018833
+sacoglossans	lipid droplet (GO:0005811)	8	0.106666667	3.64E-05
+sacoglossans	outer membrane (GO:0019867)	7	0.093333333	0.003048712
+sacoglossans	mitochondrial outer membrane (GO:0005741)	7	0.093333333	0.001577279
+sacoglossans	reg. of reactive oxygen species MP (GO:2000377)	6	0.08	0.01800293
+sacoglossans	response to vitamin (GO:0033273)	6	0.08	0.006570237
+sacoglossans	reg. of cell killing (GO:0031341)	6	0.08	1.03E-05
+sacoglossans	reg. of leukocyte mediated cytotox. (GO:0001910)	6	0.08	2.32E-06
+sacoglossans	carbohydrate binding (GO:0030246)	5	0.066666667	0.043161056
+sacoglossans	response to zinc ion (GO:0010043)	5	0.066666667	0.006751618
+sacoglossans	guanosine-containing compound MP (GO:1901068)	5	0.066666667	0.00276201
+sacoglossans	reg. of adaptive immune response (GO:0002819)	5	0.066666667	0.002624403
+sacoglossans	neg. reg. of reactive oxygen species BP (GO:1903427)	5	0.066666667	0.000762963
+sacoglossans	GTP MP (GO:0046039)	5	0.066666667	0.000657154
+sacoglossans	neg. reg. of nitric oxide BP (GO:0045019)	5	0.066666667	4.49E-05

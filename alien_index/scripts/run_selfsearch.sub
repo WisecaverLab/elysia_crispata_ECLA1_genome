@@ -1,0 +1,38 @@
+#! /usr/local/bin/bash
+#SBATCH --mail-type=END,FAIL
+
+module load hmmer
+
+THREADS="$(($THREADS-1))"
+
+if [[ "$PROGRAM" == 'phmmer' ]]; then
+
+	# for self-phmmer
+	SELF="${QUERY}.vself.hmmer"
+
+	echo esl-sfetch --index $QUERY 
+	( time esl-sfetch --index $QUERY ) 2>&1
+
+	echo $PROGRAM --cpu $THREADS --F1 1e-10 --F2 1e-15 --F3 1e-20 --noali --notextw -o /dev/null --tblout $SELF $QUERY $QUERY
+	( time $PROGRAM --cpu $THREADS --F1 1e-10 --F2 1e-15 --F3 1e-20 --noali --notextw -o /dev/null --tblout $SELF $QUERY $QUERY ) 2>&1
+
+fi
+
+
+if [[ "$PROGRAM" == 'diamond' ]]; then
+	
+	# for self-diamond
+	SELF="${QUERY}.vself.dmnd"
+	DB="${QUERY}.dmnd"
+
+	echo esl-sfetch --index $QUERY 
+	( time esl-sfetch --index $QUERY ) 2>&1
+
+	echo $PROGRAM makedb --in $QUERY --db $DB --masking 0 --threads $THREADS
+	( time $PROGRAM makedb --in $QUERY --db $DB --masking 0 --threads $THREADS ) 2>&1
+
+	echo $PROGRAM blastp --evalue 1e-3 --sensitive --max-target-seqs 0 --query $QUERY --db $DB --out $SELF --outfmt 6 --masking 0 --threads $THREADS
+	( time $PROGRAM blastp --evalue 1e-3 --sensitive --max-target-seqs 0 --query $QUERY --db $DB --out $SELF --outfmt 6 --masking 0 --threads $THREADS ) 2>&1
+	
+fi
+

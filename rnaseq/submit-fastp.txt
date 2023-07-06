@@ -1,0 +1,13 @@
+export SAMPLE='AS1'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='AS3'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='AS4'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='E3'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='E5'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='E7'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='L4'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='L5'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='L8'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='V32'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='V34'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+export SAMPLE='V35'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+

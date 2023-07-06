@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --account=jwisecav
+#SBATCH --mail-type=END,FAIL
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=4:00:00     
+#SBATCH --output=slurm-out/%x.o%j
+#SBATCH --error=slurm-out/%x.e%j
+
+# usage: export SAMPLE='sampleid'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-fastp" scripts/2_run_fastp_paired.sub
+
+module load conda-env/read_preprocessing-py3.8.3  
+module load fastqc
+
+#User defined parameters
+INDIR='1_RawRNASeq'
+OUTDIR='2_CleanRNASeq'
+ADAPTERS='scripts/adapters.fa'
+THREADS=15
+OPTIONS="--thread $THREADS --adapter_fasta $ADAPTERS --json ${OUTDIR}/${SAMPLE}_fastp.json --html ${OUTDIR}/${SAMPLE}_fastp.html --low_complexity_filter --correction --trim_poly_g --trim_poly_x --overrepresentation_analysis"
+
+echo fastp -i ${INDIR}/${SAMPLE}_1.fq.gz -I ${INDIR}/${SAMPLE}_2.fq.gz -o ${OUTDIR}/${SAMPLE}_1.fq.gz -O ${OUTDIR}/${SAMPLE}_2.fq.gz $OPTIONS
+fastp -i ${INDIR}/${SAMPLE}_1.fq.gz -I ${INDIR}/${SAMPLE}_2.fq.gz -o ${OUTDIR}/${SAMPLE}_1.fq.gz -O ${OUTDIR}/${SAMPLE}_2.fq.gz $OPTIONS
+
+echo fastqc ${OUTDIR}/${SAMPLE}_1.fq.gz ${OUTDIR}/${SAMPLE}_2.fq.gz
+fastqc ${OUTDIR}/${SAMPLE}_1.fq.gz ${OUTDIR}/${SAMPLE}_2.fq.gz
+
+
+

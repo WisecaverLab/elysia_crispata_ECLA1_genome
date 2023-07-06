@@ -1,0 +1,27 @@
+#!/bin/bash
+#SBATCH --account=jwisecav
+#SBATCH --mail-type=END,FAIL
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=120G
+#SBATCH --time=72:00:00     
+#SBATCH --output=slurm-out/%x.o%j
+#SBATCH --error=slurm-out/%x.e%j
+
+# usage: export SAMPLE='sampleid'; sbatch --mail-user=$EMAIL -J "${SAMPLE}-kallisto" scripts/run_kallisto_paired.sub 
+
+module load conda-env/kallisto-py3.8.3      
+
+#User defined parameters
+INDIR='02_CleanRNASeq'
+OUTDIR='4_expression_combined'
+INDEXPATH='Bryopsis_Elysia_combined.fasta.kallisto.index'
+
+#Create output directory
+echo "mkdir ${OUTDIR}/${SAMPLE}/"
+mkdir ${OUTDIR}/${SAMPLE}/
+
+#Kallisto command:
+kallisto quant -t 24 -i $INDEXPATH -o ${OUTDIR}/${SAMPLE}/ ${INDIR}/${SAMPLE}_1.fq.gz ${INDIR}/${SAMPLE}_2.fq.gz
+

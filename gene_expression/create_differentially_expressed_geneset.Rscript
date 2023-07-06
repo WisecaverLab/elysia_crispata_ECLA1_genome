@@ -1,0 +1,52 @@
+library(edgeR, verbose=FALSE)
+library(stringr)
+library(tximport)
+
+filesfile <- 'abundance_files_DEG.txt'
+files <- scan(filesfile, what = 'list')
+file_names <- str_split(files, '/', simplify = TRUE)
+file_names <- file_names[,ncol(file_names)-1]
+names(files) <- file_names
+
+t2gfile <- 'transcripts_to_genes2.txt'
+tx2gene <- read.table(t2gfile, sep="\t")
+
+samplefile <- 'samples_conditions_DEG.txt'
+sampleTable <- read.table(samplefile, sep="\t", header=TRUE)
+
+txi <- tximport(files, type = "kallisto", tx2gene = tx2gene, countsFromAbundance = "no")
+
+write.table(txi$counts, 'rawcounts_kallisto.matrix', sep="\t", quote = FALSE)
+
+# exclude genes that do not have TPM > 1 in at least one developmental state
+expgenesfile <- 'genes_w_avg_tpm_greater_than_1.txt'
+keeplist <- scan(expgenesfile, what = 'list')
+df_counts <- as.data.frame(txi$counts)
+df_counts$gene <- rownames(df_counts)
+df_counts <- df_counts[ df_counts$gene %in% keeplist, ]
+df_counts$gene <- NULL
+mtx_counts <- data.matrix(df_counts)
+
+#### Perform DEG analysis ####
+my_dge <- DGEList(counts = mtx_counts, group = sampleTable$condition)
+
+my_design <- model.matrix(~ 0 + my_dge$samples$group)
+rownames(my_design) <- rownames(my_dge$sample)
+colnames(my_design) <- levels(my_dge$sample$group)
+
+my_dge<-estimateDisp(my_dge, design=my_design, robust=TRUE)
+
+my_dge <- calcNormFactors(my_dge, method="TMM")
+
+test_vs_control_et <- exactTest(my_dge, pair=c("pre-feeding","post-feeding"), dispersion="trended", rejection.region="doubletail", big.count=900, prior.count=0.125)
+
+test_vs_control_tt <- topTags(test_vs_control_et, n=nrow(my_dge), sort.by="none")
+
+test_vs_control_tests <- decideTestsDGE(test_vs_control_et, adjust.method="BH", p.value=0.01, lfc=2)
+
+test_vs_control_results <- test_vs_control_tt$table
+test_vs_control_results$test <- test_vs_control_tests
+test_vs_control_results$SYMBOL <- rownames(test_vs_control_results)
+
+outfile <- 'DEG_results.txt'
+write.table(test_vs_control_results, outfile, row.names=FALSE, sep="\t", quote=FALSE)

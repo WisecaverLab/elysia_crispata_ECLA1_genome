@@ -1,0 +1,11 @@
+#order	color	hex	type	lineage	taxids
+1	indigo	#332288	metazoa	Mollusca	6447
+2	teal	#44AA99	metazoa	other_Spiralia	2697495
+3	green	#117733	metazoa	Arthropoda	6656
+4	cyan	#88CCEE	metazoa	other_Protostomia	33317
+5	olive	#999933	metazoa	Chordata	7711
+6	sand	#DDCC77	metazoa	other_Deuterostomia	33511
+7	rose	#CC6677	metazoa	other_Metazoa	33208
+8	purple	#AA4499	metazoa	other_Eukaryotes	2759
+9	darkgrey	#252525	metazoa	Fungi	4751
+10	grey	#DDDDDD	metazoa	Bacteria	2

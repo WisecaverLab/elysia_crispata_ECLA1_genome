@@ -1,0 +1,11 @@
+#! /usr/local/bin/bash
+#SBATCH --mail-type=END,FAIL
+
+
+if [[ -z $SKIPLIST ]]; then
+	echo python $SCRIPTS/calculate_alien_index.py -i $PARSEDIR -o $BASE -l $LINFILE -t $TAXDIR -r $RECIPIENT_LINEAGE -a $ANCESTRAL_LINEAGE -n $NUM_TOP_HITS 
+	python $SCRIPTS/calculate_alien_index.py -i $PARSEDIR -o $BASE -l $LINFILE -t $TAXDIR -r $RECIPIENT_LINEAGE -a $ANCESTRAL_LINEAGE -n $NUM_TOP_HITS 
+else
+	echo python $SCRIPTS/calculate_alien_index.py -i $PARSEDIR -o $BASE -l $LINFILE -t $TAXDIR -r $RECIPIENT_LINEAGE -a $ANCESTRAL_LINEAGE -n $NUM_TOP_HITS -k $SKIPLIST
+	python $SCRIPTS/calculate_alien_index.py -i $PARSEDIR -o $BASE -l $LINFILE -t $TAXDIR -r $RECIPIENT_LINEAGE -a $ANCESTRAL_LINEAGE -n $NUM_TOP_HITS -k $SKIPLIST
+fi
